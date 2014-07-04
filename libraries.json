@@ -1,0 +1,35 @@
+{
+  "libs_root": "FlaskViewer/static/libs",
+  "sites":
+  {
+  	"github": "https://raw.githubusercontent.com",
+  	"angular": "https://code.angularjs.org/1.3.0-beta.14"
+  },
+  "libs": {
+	"http://code.jquery.com/jquery-1.11.0.js": "js/{{ filename }}",
+	"http://code.jquery.com/jquery-1.11.0.min.js": "js/{{ filename }}",
+	"http://code.jquery.com/jquery-1.11.0.min.map": "js/{{ filename }}",
+	"{{ github }}/twbs/bootstrap/v3.0.3/dist/css/bootstrap.css": "css/{{ filename }}",
+	"{{ github }}/twbs/bootstrap/v3.0.3/dist/css/bootstrap.min.css": "css/{{ filename }}",
+	"{{ github }}/twbs/bootstrap/v3.0.3/dist/css/bootstrap-theme.css": "css/{{ filename }}",
+	"{{ github }}/twbs/bootstrap/v3.0.3/dist/css/bootstrap-theme.min.css": "css/{{ filename }}",
+	"{{ github }}/twbs/bootstrap/v3.0.3/dist/js/bootstrap.js": "js/{{ filename }}",
+	"{{ github }}/twbs/bootstrap/v3.0.3/dist/js/bootstrap.min.js": "js/{{ filename }}",
+	"{{ github }}/twbs/bootstrap/v3.0.3/dist/fonts/glyphicons-halflings-regular.eot": "fonts/{{ filename }}",
+	"{{ github }}/twbs/bootstrap/v3.0.3/dist/fonts/glyphicons-halflings-regular.svg": "fonts/{{ filename }}",
+	"{{ github }}/twbs/bootstrap/v3.0.3/dist/fonts/glyphicons-halflings-regular.ttf": "fonts/{{ filename }}",
+	"{{ github }}/twbs/bootstrap/v3.0.3/dist/fonts/glyphicons-halflings-regular.woff": "fonts/{{ filename }}",
+	"https://github.com/makeusabrew/bootbox/releases/download/v4.2.0/bootbox.js": "js/{{ filename }}",
+	"https://github.com/makeusabrew/bootbox/releases/download/v4.2.0/bootbox.min.js": "js/{{ filename }}",
+	"{{ github }}/lodash/lodash/2.4.1/dist/lodash.js": "js/{{ filename }}",
+	"{{ github }}/lodash/lodash/2.4.1/dist/lodash.min.js": "js/{{ filename }}",
+	"{{ github }}/mbraak/jqTree/0.21.0/jqtree.css": "css/{{ filename }}",
+	"{{ github }}/mbraak/jqTree/0.21.0/tree.jquery.js": "js/{{ filename }}",
+	"{{ angular }}/angular.js": "js/{{ filename }}",
+	"{{ angular }}/angular.min.js": "js/{{ filename }}",
+	"{{ angular }}/angular-route.js": "js/{{ filename }}",
+	"{{ angular }}/angular-route.min.js": "js/{{ filename }}",
+	"{{ angular }}/angular-resource.js": "js/{{ filename }}",
+	"{{ angular }}/angular-resource.min.js": "js/{{ filename }}"
+  }
+}
