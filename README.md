@@ -1,4 +1,4 @@
-db-viewer
+MonQL
 =========
 
-Simple database viewer for MySQL, Sqlite and Mongodb
+MongoDB MySQL and Sqlite Database Viewer.
