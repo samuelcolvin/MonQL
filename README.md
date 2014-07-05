@@ -1,4 +1,4 @@
 MonQL
 =========
 
-MongoDB MySQL and Sqlite Database Viewer.
+MongoDB, MySQL and SQLite Database Viewer.

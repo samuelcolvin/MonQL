@@ -1,1 +1,26 @@
-<strong>This is the Details page</strong>
+<div class="row">
+	<div class="col-md-4 col-xs-12 column">
+		<dl class="dl-horizontal">
+			<dt>Reference:</dt><dd>{{ con.ref }}</dd>
+			<dt>ID:</dt><dd>{{ con.id }}</dd>
+			<dt>Type:</dt><dd>{{ con.dbtype }}</dd>
+			<dt>System Name:</dt><dd>{{ con.dbname }}</dd>
+			<dt>Username:</dt><dd>{{ con.user }}</dd>
+			<dt>Password:</dt><dd>{{ con.pass }}</dd>
+			<dt>Host:</dt><dd>{{ con.host }}</dd>
+			<dt>Port:</dt><dd>{{ con.port }}</dd>
+		</dl>
+		<legend>Data Tree</legend>
+		<div class="well tree-panel">
+		  <div id="tree"></div>
+		</div>
+		<script>populatetree("/api/viewcon/{{ conid }}");</script>
+	</div>
+	
+	<div class="col-md-8 col-xs-12">
+		<div class="tree-display column">
+		  <legend>Data Display</legend>
+		  <dl id="description" class="dl-horizontal"></dl>
+		</div>
+	</div>
+</div>

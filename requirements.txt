@@ -1,4 +1,7 @@
 Flask
 Flask-Script
 PyMongo
+MySQL-python
+# pysqlite
 GrabLib
+chardet

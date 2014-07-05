@@ -5,3 +5,18 @@
 .main {
 	margin: 60px 10px 10px;
 }
+
+.not-required {
+	font-weight: 500;
+}
+
+.warning {
+	color: #a94442;
+}
+/*.edit-form input.ng-invalid.ng-dirty {
+	background-color: #FA787E;
+}
+
+.edit-form input.ng-valid.ng-dirty {
+	background-color: #78FA89;
+}*/

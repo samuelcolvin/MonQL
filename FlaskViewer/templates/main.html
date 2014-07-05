@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="en" ng-app="DbViewer">
+<html lang="en" ng-app="ConViewer">
   <head>
 	{% block head %}
 	  <meta charset="utf-8">
 	  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
-	  <meta name="description" content="MySQL, SQLlite and MongoDB Viewer">
+	  <meta name="description" content="MongoDB, MySQL and SQLite Viewer">
 	  <meta name="author" content="Samuel Colvin">
-	  <title>db-viewer</title>
+	  <title>MonQL</title>
 	  <link rel="icon" type="image/png" href={{ url_for('static', filename='favicon.ico') }} />
     <link href={{ url_for('static', filename='libs/css/bootstrap.min.css') }} rel="stylesheet">
     <link href={{ url_for('static', filename='css/styles.css') }} rel="stylesheet">
@@ -14,7 +14,8 @@
 	{% endblock head %}
   </head>
   <body {% block body_attr %}{% endblock %}>    
-    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    {% raw %}
+    <div class="navbar navbar-default navbar-fixed-top" role="navigation" ng-controller="HeadCtrl">
       <div class="navbar-cont">
         <div class="navbar-header">
           <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -23,27 +24,28 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="/">db-viewer</a>
+          <a class="navbar-brand" href="/">MonQL</a>
         </div>
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-            <li class="active"><a href="">Add DB</a></li>
-            <li class="dropdown">
-              <a href="" class="dropdown-toggle" data-toggle="dropdown">Databases <span class="caret"></span></a>
-              <ul class="dropdown-menu" role="menu" ng-controller="DbListCtrl">
-                {% raw %}
-                <li ng-repeat="db in dbs"><a href="/db/{{ db.id }}">{{ db.name }}</a></li>
-                {% endraw %}
+            <li ng-class="{active: active == 'add-con'}"><a href="/addcon">Add Connection</a></li>
+            <li ng-class="{active: active == 'view-con'}" class="dropdown">
+              <a href="" class="dropdown-toggle" data-toggle="dropdown">Connections <span class="caret"></span></a>
+              <ul class="dropdown-menu" role="menu">
+                <li ng-repeat="con in cons"><a href="/con/{{ con.id }}">{{ con.ref }} ({{ con.dbtype }})</a></li>
               </ul>
             </li>
-            <li><a href="#about">Edit DB Settings</a></li>
+            <li ng-class="{active: active == 'edit-con'}" ng-show="active == 'edit-con' || active == 'view-con'">
+              <a href="/editcon/{{ conid }}">Edit Connection</a>
+            </li>
           </ul>
           <ul class="nav navbar-nav navbar-right">
-            <li><a href="/about">About</a></li>
+            <li ng-class="{active: active == 'about'}"><a href="/about">About</a></li>
           </ul>
         </div>
       </div>
     </div>
+    {% endraw %}
     <div class="main">
     	<div ng-view></div>
     </div>
@@ -51,11 +53,13 @@
 	{% block js %}
   	<script src={{ url_for('static', filename='libs/js/jquery-1.11.0.min.js') }}></script>
   	<script src={{ url_for('static', filename='libs/js/bootstrap.min.js') }}></script>
+    <script src={{ url_for('static', filename='libs/js/bootbox.min.js') }}></script>
     <script src={{ url_for('static', filename='libs/js/angular.js') }}></script>
     <script src={{ url_for('static', filename='libs/js/angular-route.js') }}></script>
     <script src={{ url_for('static', filename='libs/js/angular-resource.js') }}></script>
     <script src={{ url_for('static', filename='libs/js/tree.jquery.js') }}></script>
     <script src={{ url_for('static', filename='js/controller.js') }}></script>
+    <script src={{ url_for('static', filename='js/tree.js') }}></script>
   {% endblock %}
   </body>
 </html>

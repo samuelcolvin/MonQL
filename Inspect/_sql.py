@@ -1,7 +1,7 @@
 import MySQLdb as mdb
 import sqlite3
-from DbInspect._utils import *
-import pandas.io.sql as psql
+from _utils import *
+# import pandas.io.sql as psql
 import traceback
 
 class _SqlBase(db_comm):
@@ -59,23 +59,23 @@ class _SqlBase(db_comm):
         finally:
             self._close()
             
-    def get_pandas(self, sql):
-        try:
-            self._con_cur()
-            df = psql.frame_query(sql, con=self._con)
-            return self._sanitize_df(df)
-        except Exception, e:
-            traceback.print_exc()
-            print "Error: %s" % str(e)
-            self._close()
-            raise(e)
+    # def get_pandas(self, sql):
+    #     try:
+    #         self._con_cur()
+    #         df = psql.frame_query(sql, con=self._con)
+    #         return self._sanitize_df(df)
+    #     except Exception, e:
+    #         traceback.print_exc()
+    #         print "Error: %s" % str(e)
+    #         self._close()
+    #         raise(e)
             
     def generate_string(self, sql, string_format='csv'):
         df = self.get_pandas(sql)
         return self._to_string(df, sql, string_format)
     
-    def insert_pandas(self, t_name, df):
-        raise Exception('not implemented')
+    # def insert_pandas(self, t_name, df):
+    #     raise Exception('not implemented')
         
     def _execute(self, command):
         try:
@@ -158,7 +158,7 @@ class MySql(_SqlBase):
     def _process_column(self, col, fields):
         fields.append([col[0], self._types[col[1]]])
 
-class SqlLite(_SqlBase):
+class SQLite(_SqlBase):
         
     def _get_con(self):
         return sqlite3.connect(self._dbsets['path'])
