@@ -38,7 +38,7 @@ ConViewer.config(['$routeProvider', '$locationProvider',
 
 function HeadCtrl($scope, $http) {
 	$scope.update = function(){
-		$http.get('/api/cons').success(function(data) {
+		$http.get('/api/cons?').success(function(data) {
 			$scope.cons = data.cons;
 		});
 	};
@@ -57,6 +57,27 @@ function HeadCtrl($scope, $http) {
 	});
 }
 
+function MsgCtrl($scope, $http) {
+  $scope.success = function(msg){
+    $scope.success_msg = msg;
+  };
+  $scope.success(false);
+  var keepmsg = false;
+
+  $scope.$on('success', function(event, msg, persist) {
+    console.log('success msg:', msg);
+    keepmsg = persist;
+    $scope.success(msg);
+  });
+
+  $scope.$on('set-active', function(event, active) {
+    if (!keepmsg){
+      $scope.success(false);
+    }
+    keepmsg = false;
+  });
+}
+
 function ConDetailsCtrl($scope, $rootScope, $http, $routeParams) {
 	$rootScope.$broadcast('set-active', 'view-con');
 	var conid = $routeParams.conid;
@@ -73,7 +94,15 @@ function IndexCtrl($rootScope) {
 
 var default_ports = {MongoDB: 27017, MySQL: 3306};
 
-function EditConCtrl($scope, $rootScope, $http, $routeParams) {
+function response_error(prefix, data){
+    var msg = prefix;
+    if (typeof(data.error) == 'string'){
+      msg += data.error;
+    }
+    bootbox.alert(msg);
+}
+
+function EditConCtrl($scope, $rootScope, $http, $routeParams, $location) {
 	$scope.master = {host: 'localhost', 'port': '0'};
 	var edit = typeof($routeParams.conid) == 'string';
 	$scope.saved = edit;
@@ -100,18 +129,28 @@ function EditConCtrl($scope, $rootScope, $http, $routeParams) {
 		var response = $http.post("/api/submitcon", $scope.master, {});
 		response.success(function(data, status, headers, config) {
 			$scope.master = data.data;
-			$scope.success = 'Settings saved';
+      $rootScope.$broadcast('success', $scope.saved ? 'Connection Updated' : 'Connection Saved', false);
 			$scope.saved = true;
 			$rootScope.$broadcast('update-cons');
 		});
 		response.error(function(data, status, headers, config) {
-			var msg = 'Error submitting form: ';
-			if (typeof(data.error) == 'string'){
-				msg += data.error;
-			}
-			bootbox.alert(msg);
+      response_error('Error submitting form: ', data);
 		});
 	};
+
+  $scope.delete = function(con){
+    console.log('delete: ', con);
+    var response = $http.get("/api/delete/" + $scope.master.id);
+    response.success(function(data, status, headers, config) {
+      console.log('connection delete');
+      $rootScope.$broadcast('update-cons');
+      $location.path('/');
+      $rootScope.$broadcast('success', 'Deleted Connection ' + $scope.master.id + ' (' + con.ref + ')', true);
+    });
+    response.error(function(data, status, headers, config) {
+      response_error('Error deleting connection: ', data);
+    });
+  };
 
 	$scope.testconnection = function(con){
     var response = $http.get("/api/testcon/" + $scope.master.id);
@@ -121,16 +160,12 @@ function EditConCtrl($scope, $rootScope, $http, $routeParams) {
       bootbox.alert(msg);
     });
     response.error(function(data, status, headers, config) {
-      var msg = 'Error testing connection: ';
-      if (typeof(data.error) == 'string'){
-        msg += data.error;
-      }
-      bootbox.alert(msg);
+      response_error('Error testing connection: ', data);
     });
 	};
 
 	$scope.change_type = function(con){
-		con.port = default_ports[con.type];
+		con.port = default_ports[con.dbtype];
 	};
 }
 

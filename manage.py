@@ -2,14 +2,14 @@ from flask.ext.script import Manager
 import FlaskViewer
 
 manager = Manager(FlaskViewer.app)
+TEST_DB = 0
 
-
-# @manager.command
-# def initdb():
-#     """Create the database tables"""
-#     print 'Using database %s' % bf3.db.engine.url
-#     bf3.db.create_all()
-#     print 'Created tables'
+@manager.command
+def test():
+    """System Test"""
+    import test
+    test.con(TEST_DB)
+    test.tree(TEST_DB)
 
 
 # @manager.command

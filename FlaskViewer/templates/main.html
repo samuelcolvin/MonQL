@@ -13,7 +13,7 @@
     <link rel="stylesheet" href={{ url_for('static', filename='libs/css/jqtree.css') }}>
 	{% endblock head %}
   </head>
-  <body {% block body_attr %}{% endblock %}>    
+  <body {% block body_attr %}{% endblock %}>
     {% raw %}
     <div class="navbar navbar-default navbar-fixed-top" role="navigation" ng-controller="HeadCtrl">
       <div class="navbar-cont">
@@ -47,6 +47,13 @@
     </div>
     {% endraw %}
     <div class="main">
+      {% raw %}
+      <div ng-controller="MsgCtrl">
+        <div ng-show="success_msg" class="alert alert-success" role="alert">
+          <p>{{ success_msg }}</p>
+        </div>
+      </div>
+      {% endraw %}
     	<div ng-view></div>
     </div>
   	

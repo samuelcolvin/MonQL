@@ -5,6 +5,7 @@ import json
 import collections
 import traceback
 import StringIO
+import json
 # import pandas as pd
 # import numpy
 
@@ -20,13 +21,20 @@ class MongoDB(db_comm):
             raise Exception(msg)
             
     def get_version(self):
-        return pymongo.version
+        try:
+            mongv = self._client.server_info()['version']
+        except:
+            mongv = 'unknown'
+        return 'PyMongo v%s, Mongo Server v%s' % (pymongo.version, mongv)
+
+    def server_info(self):
+        return json.dumps(self._client.server_info(), indent = 2)
     
     def get_databases(self):
         return self._client.database_names()
     
-    def get_database(self):
-        self.db = self._client[dbsets['dbname']]
+    def set_database(self, dbname):
+        self.db = self._client[dbname]
         return self.db
     
     def get_tables(self):

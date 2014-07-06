@@ -1,6 +1,3 @@
-<div ng-show="success" class="alert alert-success" role="alert">
-	<p>{{ success }}</p>
-</div>
 <form novalidate name="form" role="form" class="edit-form">
 	<div class="form-group">
 		<label for="tbtype">Connection Type</label>
@@ -15,10 +12,10 @@
 		<input type="text" class="form-control" name="conref" id="conref" placeholder="Display name" ng-model="con.ref" required>
 		<div ng-show="form.conref.$dirty && form.conref.$error.required" class="warning">A DB Reference is required</div>
 	</div>
-	<div ng-show="con.dbtype == 'MySQL'" class="form-group">
-		<label for="conname">System Name</label>
-		<input type="text" class="form-control" name="conname" id="conname" placeholder="Connection name" ng-model="con.dbname"  ng-required="con.dbtype == 'MySQL'">
-		<div ng-show="form.conname.$dirty && form.conname.$error.required" class="warning">System Name is Required</div>
+	<div ng-show="con.dbtype == 'MongoDB' || con.dbtype == 'MySQL'" class="form-group">
+		<label for="conname">Database Name</label>
+		<input type="text" class="form-control" name="conname" id="conname" placeholder="Database name" ng-model="con.dbname">
+		<p class="help-block">Leave blank to view all databases.</p>
 	</div>
 	<div ng-show="con.dbtype == 'SQLite'" class="form-group">
 		<label ng-show="con.dbtype == 'SQLite'" for="conpath">File Path</label>
@@ -58,4 +55,5 @@
 	</div> -->
 	<button type="submit" class="btn btn-default" ng-click="save(con)" ng-disabled="form.$invalid">Submit</button>
 	<button type="submit" class="btn btn-default" ng-click="testconnection(con)" ng-disabled="!saved">Test Connection</button>
+	<button type="submit" class="btn btn-default" ng-click="delete(con)" ng-show="saved">Delete Connection</button>
 </form>

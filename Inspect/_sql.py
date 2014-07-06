@@ -25,6 +25,9 @@ class _SqlBase(db_comm):
     def get_table_fields(self, t_name):
         sql = 'SELECT * FROM %s LIMIT 1' % t_name
         return self.get_query_fields(sql)
+
+    def server_info(self):
+        return 'unknown'
     
     def get_query_fields(self, sql, ex_type = None):
         if 'limit' not in sql.lower():
