@@ -1,7 +1,6 @@
 from flask import render_template, jsonify, request
 import json, traceback
-from FlaskViewer.Connections import app, connections, test_connection, tree_json
-from pprint import pprint
+from MonQL.Connections import app, connections, test_connection, tree_json
 
 def jsonabort(e):
     traceback.print_exc()

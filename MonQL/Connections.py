@@ -1,7 +1,7 @@
 from datetime import datetime as dtdt
 import traceback, json, os
-from FlaskViewer import app
-import Inspect
+from MonQL import app
+import MonQL.Inspect
 from pprint import pprint
 
 class Connections(object):
@@ -59,7 +59,7 @@ class Connections(object):
 connections = Connections()
 
 def getcomms(con):
-    return getattr(Inspect, con['dbtype'])(con)
+    return getattr(MonQL.Inspect, con['dbtype'])(con)
 
 def test_connection(conid):
     con = connections.select(int(conid))
