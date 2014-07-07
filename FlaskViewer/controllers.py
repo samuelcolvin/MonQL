@@ -1,11 +1,18 @@
 from flask import render_template, jsonify, request
 import json, traceback
-from FlaskViewer.Connections import app, connections, test_connection
+from FlaskViewer.Connections import app, connections, test_connection, tree_json
+from pprint import pprint
 
 def jsonabort(e):
     traceback.print_exc()
     print 'ERROR: %s' % str(e)
     return jsonify(error = str(e)), 400
+
+def jsonifyany(ob):
+    if isinstance(ob, list):
+        return json.dumps(ob)
+    else:
+        return jsonify(**ob)
 
 @app.route('/')
 @app.route('/about')
@@ -13,7 +20,6 @@ def jsonabort(e):
 @app.route('/editcon/<_>')
 @app.route('/con/<_>')
 def index(_=None):
-    print connections()
     return render_template('main.html')
 
 @app.route('/api/cons')
@@ -26,20 +32,14 @@ def condef(conid):
         return jsonify(con = connections.select(int(conid)))
     except Exception, e: return jsonabort(e)
 
-@app.route('/api/viewcon/<conid>')
-def view_connection(conid):
-    print type(conid), conid
-    data = [
-        {
-            'label': 'node1',
-            'children': [{ 'label': 'child1' },{ 'label': 'child2' }]
-        },
-        {
-            'label': 'node2',
-            'children': [ { 'label': 'child3' } ]
-        }
-    ]
-    return jsonify(DATA=data)
+@app.route('/api/viewtree/<conid>')
+def viewtree(conid):
+    node = None
+    if 'node' in request.args:
+        node = int(request.args.get('node'))
+    data = tree_json(int(conid), node)
+    # pprint(data)
+    return jsonifyany(data)
 
 @app.route('/api/submitcon', methods=['POST'])
 def submitcon():

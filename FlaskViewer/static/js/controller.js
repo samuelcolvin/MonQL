@@ -83,6 +83,14 @@ function ConDetailsCtrl($scope, $rootScope, $http, $routeParams) {
 	var conid = $routeParams.conid;
 	$rootScope.$broadcast('set-conid', conid);
 	$scope.conid = conid;
+  var gottree = false;
+  $scope.show_tree = function(){
+    if (!gottree){
+      populatetree();
+      gottree = true;
+    }
+    return true;
+  };
 	$http.get('/api/condef/' + conid).success(function(data) {
 		$scope.con = data.con;
 	});

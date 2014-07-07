@@ -10,7 +10,6 @@ import json
 # import numpy
 
 class MongoDB(db_comm):
-    
     def __init__(self, dbsets):
         try:
             self._client = pymongo.MongoClient(dbsets['host'], dbsets['port'])
@@ -32,20 +31,21 @@ class MongoDB(db_comm):
     
     def get_databases(self):
         return self._client.database_names()
+
+    def get_database(self, dbname):
+        return self._client[dbname]
     
-    def set_database(self, dbname):
-        self.db = self._client[dbname]
-        return self.db
-    
-    def get_tables(self):
+    def get_tables(self, dbname):
+        db = self.get_database(dbname)
         tables = []
-        for name in self.db.collection_names():
-            tables.append((name, (name, self.db[name].count())))
+        for name in db.collection_names():
+            tables.append((name, (name, db[name].count())))
         field_names = ('name', 'count')
         return tables, field_names
         
-    def get_table_fields(self, t_name):
-        f = self.db[t_name].find_one()
+    def get_table_fields(self, dbname, t_name):
+        db = self.get_database(dbname)
+        f = db[t_name].find_one()
         if f:
             return [(k, type(v).__name__) for k, v in f.items()]
         return []
@@ -56,8 +56,9 @@ class MongoDB(db_comm):
             return [(k, type(v).__name__) for k, v in row.items()]
         return []
     
-    def get_values(self, t_name, limit = SIMPLE_LIMIT):
-        c = self.db[t_name].find(limit=limit)
+    def get_values(self, dbname, t_name, limit = SIMPLE_LIMIT):
+        db = self.get_database(dbname)
+        c = db[t_name].find(limit=limit)
         return self._process_data(c)[0]
     
     def execute(self, code, ex_type = None):
@@ -110,13 +111,14 @@ class MongoDB(db_comm):
     #         collection.insert(row_dict)
     #     return i + 1
     
-    def _execute(self, code, ex_type = None):
+    def _execute(self, dbname, code, ex_type = None):
+        db = self.get_database(dbname)
         self._code_lines = code.split('\n')
         self._get_other_vars()
         if self._source_col is None:
             raise Exception('The souce collection must be defined in the top level of the code'+
                             ' as "source = <collection_name>')
-        collection = self.db[self._source_col]
+        collection = db[self._source_col]
         if ex_type == 'map_reduce':
             if self._dest_col is None:
                 raise Exception('The destination collection must be defined in the top level of the code'+

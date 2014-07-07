@@ -2,6 +2,7 @@ from datetime import datetime as dtdt
 import traceback, json, os
 from FlaskViewer import app
 import Inspect
+from pprint import pprint
 
 class Connections(object):
     _cons = None
@@ -55,17 +56,10 @@ class Connections(object):
             separators=(',', ': '), 
             sort_keys = True)
 
-def getcomms(con):
-    return getattr(Inspect, con['dbtype'])(con)
-
 connections = Connections()
 
-def tree_json(conid, node = None):
-    tree = TreeGenerater(conid)
-    if node:
-        return tree.get_values(node)
-    else:
-        return tree.json_data
+def getcomms(con):
+    return getattr(Inspect, con['dbtype'])(con)
 
 def test_connection(conid):
     con = connections.select(int(conid))
@@ -78,7 +72,7 @@ def test_connection(conid):
         response += 'Server Info:\n%s\n' % comms.server_info()
         if 'dbname' in con:
             response += 'Connection to db %s\n' % con['dbname']
-            tables, prop_names = comms.get_tables(con['dbname'])
+            tables, _ = comms.get_tables(con['dbname'])
             response += '%d tables found\n' % len(tables)
         else:
             response += 'No database name entered, not connecting to db'
@@ -88,28 +82,40 @@ def test_connection(conid):
         response += '\n** Successfully Connected **'
     return response
 
+def tree_json(conid, node = None):
+    tree = TreeGenerater(conid)
+    if node:
+        return tree.get_values(node)
+    else:
+        return tree.data
+
 class TreeGenerater(object):
     _id = 0
     comms = {}
     
     def __init__(self, conid):
-        self._data = {'DATA': []}
-        con = connections()[conid]
-        self._get_dbs(con)
-        self.json_data = json.dumps(self._data, indent=2)
+        self.data = {'DATA': []}
+        self._con = connections()[conid]
+        self._comms = getcomms(self._con)
+        self._get_con()
     
-    # def get_values(self, node_id):
-    #     node_id = int(node_id)
-    #     db_id, table = self._find_table(node_id)
-    #     comms = self._get_comms(m.Database.objects.get(id=db_id))
-    #     table_name = table['table_name']
-    #     fields = [f[0] for f in table['fields']]
-    #     rows = self._get_rows(comms.get_values(table_name), fields)
-    #     table['children'] = rows
-    #     if 'load_on_demand' in table:
-    #         del table['load_on_demand']
-    #     self._generate_json()
-    #     return json.dumps(rows)
+    def get_values(self, node_id):
+        node_id = int(node_id)
+        dbname, table = self._find_table(node_id)
+        table_name = table['table_name']
+        fields = [f[0] for f in table['fields']]
+        rows = self._get_rows(self._comms.get_values(dbname, table_name), fields)
+        table['children'] = rows
+        if 'load_on_demand' in table:
+            del table['load_on_demand']
+        return rows
+
+    @property
+    def json_data(self):
+        return self._2json(self.data)
+
+    def _2json(self, data):
+        return json.dumps(data, indent=2)
     
     # def execute_query(self, query):
     #     comms = self._get_comms(m.Database.objects.get(id=query.db.id))
@@ -120,7 +126,7 @@ class TreeGenerater(object):
     #         d['info'] = [('Query Properties', [])]
     #         d['info'][0][1].append(('Results', len(rows)))
     #         d['info'][0][1].append(('Code', query.code))
-    #         self._data['DATA'].append(d)
+    #         self.data['DATA'].append(d)
     #         self._generate_json()
     #         return None
     #     else:
@@ -136,36 +142,46 @@ class TreeGenerater(object):
         return rows
     
     def _find_table(self, node_id):
-        for db_info in self._data['DATA']:
-            db_id = db_info['db_id']
-            for table in db_info['children']:
-                if table['id'] == node_id:
-                    return db_id, table
+        for con in self.data['DATA']:
+            for db in con['children']:
+                dbname = db['name']
+                for table in db['children']:
+                    if table['id'] == node_id:
+                        return dbname, table
+        raise Exception('Table %d not found' % node_id)
     
-    def _get_dbs(self, con):
+    def _get_con(self):
         try:
-            comms = getcomms(con)
-            d = {'id': self._get_id(), 'label': 'CONNECTION: %s' % con['ref'], 'con_id': con['id']}
-            d['info'] = [('Database Properties', [])]
-            for name, value in con.items():
-                d['info'][0][1].append((name, value))
-            d['info'][0][1].append(('DB Version', comms.get_version()))
+            c = {'id': self._get_id(), 'label': 'CONNECTION: %s' % self._con['ref'], 'con_id': self._con['id']}
+            c['info'] = [('Database Properties', [])]
+            for name, value in self._con.items():
+                c['info'][0][1].append((name, value))
+            c['info'][0][1].append(('DB Version', self._comms.get_version()))
             dbs = []
-            for name in comms.get_databases():
+            for name in self._comms.get_databases():
                 dbs.append(('', name))
             if len(dbs) > 0:
-                d['info'].append(('Databases', dbs))
-            if 'dbname' in con:
-                d['children'] = self._get_tables(comms, con)
+                c['info'].append(('Databases', dbs))
+            if 'dbname' in self._con:
+                dbs = [self._con['dbname']]
+            else:
+                dbs = self._comms.get_databases()
+            c['children'] = self._get_dbs(dbs)
         except Exception, e:
             traceback.print_exc()
-            self._data['ERROR'] = str(e)
+            self.data['ERROR'] = str(e)
         else:
-            self._data['DATA'].append(d)
-        
-    def _get_tables(self, comms, con):
+            self.data['DATA'].append(c)
+
+    def _get_dbs(self, dbs):
+        return [{'label': db, 
+                 'children': self._get_tables(db), 
+                 'id': self._get_id(),
+                 'name': db} for db in dbs]
+
+    def _get_tables(self, dbname):
         t_data = []
-        tables, prop_names = comms.get_tables(con['dbname'])
+        tables, prop_names = self._comms.get_tables(dbname)
         for t_name, t_info in tables:
             table = {'id': self._get_id(), 'label': t_name, 'table_name': t_name, 'load_on_demand': True}
             table['info'] = [('Table Properties', []), ('Fields', [])]
@@ -173,7 +189,7 @@ class TreeGenerater(object):
                 if type(value) == dtdt:
                     value = value.strftime('%Y-%m-%d %H:%M:%S %Z')
                 table['info'][0][1].append((name, value))
-            fields = comms.get_table_fields(t_name)
+            fields = self._comms.get_table_fields(dbname, t_name)
             table['info'][0][1].append(('Field Count', len(fields)))
             table['fields'] = fields
             for field in fields:
@@ -186,9 +202,9 @@ class TreeGenerater(object):
         return self._id
     
     def _get_max_id(self):
-        if self._id != 0 or len(self._data['DATA']) == 0:
+        if self._id != 0 or len(self.data['DATA']) == 0:
             return self._id
-        return self._get_max_id_rec(self._data['DATA'][-1])
+        return self._get_max_id_rec(self.data['DATA'][-1])
     
     def _get_max_id_rec(self, ob):
         if 'children' in ob and len(ob['children']) > 0:

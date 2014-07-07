@@ -2,7 +2,7 @@
 	<div class="col-md-4 col-xs-12 column">
 		<dl class="dl-horizontal">
 			<dt>Reference:</dt><dd>{{ con.ref }}</dd>
-			<dt>ID:</dt><dd>{{ con.id }}</dd>
+			<dt>ID:</dt><dd id="conid">{{ con.id }}</dd>
 			<dt>Type:</dt><dd>{{ con.dbtype }}</dd>
 			<dt>System Name:</dt><dd>{{ con.dbname }}</dd>
 			<dt>Username:</dt><dd>{{ con.user }}</dd>
@@ -11,10 +11,9 @@
 			<dt>Port:</dt><dd>{{ con.port }}</dd>
 		</dl>
 		<legend>Data Tree</legend>
-		<div class="well tree-panel">
-		  <div id="tree"></div>
+		<div ng-show="show_tree()" class="well tree-panel">
+		  <div id="tree" data-url="/api/viewtree/{{ conid }}" jstree></div>
 		</div>
-		<script>populatetree("/api/viewcon/{{ conid }}");</script>
 	</div>
 	
 	<div class="col-md-8 col-xs-12">

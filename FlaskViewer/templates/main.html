@@ -12,6 +12,17 @@
     <link href={{ url_for('static', filename='css/styles.css') }} rel="stylesheet">
     <link rel="stylesheet" href={{ url_for('static', filename='libs/css/jqtree.css') }}>
 	{% endblock head %}
+  {% block js %}
+    <script src={{ url_for('static', filename='libs/js/jquery-1.11.0.min.js') }}></script>
+    <script src={{ url_for('static', filename='libs/js/bootstrap.min.js') }}></script>
+    <script src={{ url_for('static', filename='libs/js/bootbox.min.js') }}></script>
+    <script src={{ url_for('static', filename='libs/js/angular.js') }}></script>
+    <script src={{ url_for('static', filename='libs/js/angular-route.js') }}></script>
+    <script src={{ url_for('static', filename='libs/js/angular-resource.js') }}></script>
+    <script src={{ url_for('static', filename='libs/js/tree.jquery.js') }}></script>
+    <script src={{ url_for('static', filename='js/controller.js') }}></script>
+    <script src={{ url_for('static', filename='js/tree.js') }}></script>
+  {% endblock %}
   </head>
   <body {% block body_attr %}{% endblock %}>
     {% raw %}
@@ -54,19 +65,7 @@
         </div>
       </div>
       {% endraw %}
-    	<div ng-view></div>
+    	<div id="main-ctrl" ng-view></div>
     </div>
-  	
-	{% block js %}
-  	<script src={{ url_for('static', filename='libs/js/jquery-1.11.0.min.js') }}></script>
-  	<script src={{ url_for('static', filename='libs/js/bootstrap.min.js') }}></script>
-    <script src={{ url_for('static', filename='libs/js/bootbox.min.js') }}></script>
-    <script src={{ url_for('static', filename='libs/js/angular.js') }}></script>
-    <script src={{ url_for('static', filename='libs/js/angular-route.js') }}></script>
-    <script src={{ url_for('static', filename='libs/js/angular-resource.js') }}></script>
-    <script src={{ url_for('static', filename='libs/js/tree.jquery.js') }}></script>
-    <script src={{ url_for('static', filename='js/controller.js') }}></script>
-    <script src={{ url_for('static', filename='js/tree.js') }}></script>
-  {% endblock %}
   </body>
 </html>

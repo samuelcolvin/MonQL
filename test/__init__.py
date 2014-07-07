@@ -9,4 +9,4 @@ def con(conid = 0):
 def tree(conid = 0):
     print '\n  **testing tree with connection id = %d**' % conid
     data = Connections.tree_json(conid)
-    print data
+    pprint(data)
