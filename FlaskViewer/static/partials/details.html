@@ -1,5 +1,9 @@
 <div class="row">
 	<div class="col-md-4 col-xs-12 column">
+		<div class="btn-group con-buttons">
+			<a class="btn btn-default" href="/editcon/{{ conid }}">Edit Connection</a>
+			<button class="btn btn-default" ng-click="testconnection(con)">Test Connection</button>
+		</div>
 		<dl class="dl-horizontal">
 			<dt>Reference:</dt><dd>{{ con.ref }}</dd>
 			<dt>ID:</dt><dd id="conid">{{ con.id }}</dd>

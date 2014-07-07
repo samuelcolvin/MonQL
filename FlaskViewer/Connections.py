@@ -77,7 +77,8 @@ def test_connection(conid):
         else:
             response += 'No database name entered, not connecting to db'
     except Exception, e:
-        response += '\n** Error: %s **' % str(e)
+        traceback.print_exc()
+        response += '\n** Error: %s %s **' % (e.__class__.__name__, str(e))
     else:
         response += '\n** Successfully Connected **'
     return response

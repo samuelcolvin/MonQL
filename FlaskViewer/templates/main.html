@@ -46,9 +46,6 @@
                 <li ng-repeat="con in cons"><a href="/con/{{ con.id }}">{{ con.ref }} ({{ con.dbtype }})</a></li>
               </ul>
             </li>
-            <li ng-class="{active: active == 'edit-con'}" ng-show="active == 'edit-con' || active == 'view-con'">
-              <a href="/editcon/{{ conid }}">Edit Connection</a>
-            </li>
           </ul>
           <ul class="nav navbar-nav navbar-right">
             <li ng-class="{active: active == 'about'}"><a href="/about">About</a></li>

@@ -4,7 +4,6 @@ function populatetree(){
 	desc = $('#description');
 	var url = $tree.attr('data-url');
 	$.getJSON(url, function(data) {
-		console.log(data);
 		$tree.tree({data: data.DATA}).bind('click', onclick);
 		if (typeof(data.ERROR) != 'undefined'){
 			bootbox.alert(str2html(data.ERROR));
@@ -33,4 +32,9 @@ function onclick(event) {
 				});
 			});
 		}
+}
+
+function setheight(){
+	var column = $('.column');
+	column.height($(window).height() - column.offset().top - 20);
 }

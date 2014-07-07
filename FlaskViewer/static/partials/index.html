@@ -1,1 +1,25 @@
-<strong>This is the Index page</strong>
+<h3>Connections</h3>
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>DB Name</th>
+      <th>Username</th>
+      <th>Password</th>
+      <th>Host</th>
+      <th>Port</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr ng-repeat="con in cons">
+      <td><a href="/con/{{ con.id }}">{{ con.ref }}</a></td>
+      <td>{{ con.dbtype }}</td>
+      <td>{{ con.dbname }}</td>
+      <td>{{ con.user }}</td>
+      <td>{{ con.pass }}</td>
+      <td>{{ con.host }}</td>
+      <td>{{ con.port }}</td>
+    </tr>
+  </tbody>
+</table>

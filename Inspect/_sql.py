@@ -11,7 +11,7 @@ class _SqlBase(db_comm):
         self._con_sets = con_sets
         self._setup_types()
         self._con_cur()
-        self.db_name = con_sets['dbname']
+        self.db_name = con_sets.get('dbname', None)
     
     def _con_cur(self):
         if not self._con:

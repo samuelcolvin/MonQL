@@ -94,10 +94,18 @@ function ConDetailsCtrl($scope, $rootScope, $http, $routeParams) {
 	$http.get('/api/condef/' + conid).success(function(data) {
 		$scope.con = data.con;
 	});
+
+	$scope.testconnection = function(con){
+    testconnection(con, $http);
+	};
+	setheight();
 }
 
-function IndexCtrl($rootScope) {
+function IndexCtrl($scope, $rootScope, $http) {
 	$rootScope.$broadcast('set-active', '');
+	$http.get('/api/cons?').success(function(data) {
+		$scope.cons = data.cons;
+	});
 }
 
 var default_ports = {MongoDB: 27017, MySQL: 3306};
@@ -120,7 +128,6 @@ function EditConCtrl($scope, $rootScope, $http, $routeParams, $location) {
   };
 
 	if (edit){
-		$rootScope.$broadcast('set-active', 'edit-con');
 		$http.get('/api/condef/' + $routeParams.conid).success(function(data) {
 			$scope.master = data.con;
 			$scope.reset();
@@ -161,15 +168,7 @@ function EditConCtrl($scope, $rootScope, $http, $routeParams, $location) {
   };
 
 	$scope.testconnection = function(con){
-    var response = $http.get("/api/testcon/" + $scope.master.id);
-    response.success(function(response, status, headers, config) {
-      console.log(response);
-      var msg = 'Connection Test results: \n<pre>\n' + response + '\n</pre>';
-      bootbox.alert(msg);
-    });
-    response.error(function(data, status, headers, config) {
-      response_error('Error testing connection: ', data);
-    });
+    testconnection($scope.master, $http);
 	};
 
 	$scope.change_type = function(con){
@@ -181,6 +180,14 @@ function AboutCtrl($rootScope) {
 	$rootScope.$broadcast('set-active', 'about');
 }
 
-function page(){
-	return 'addcon';
+function testconnection(con, $http){
+  var response = $http.get("/api/testcon/" + con.id);
+  response.success(function(response) {
+    console.log(response);
+    var msg = 'Connection Test results: \n<pre>\n' + response + '\n</pre>';
+    bootbox.alert(msg);
+  });
+  response.error(function(data) {
+    response_error('Error testing connection: ', data);
+  });
 }
