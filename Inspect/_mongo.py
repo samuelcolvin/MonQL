@@ -1,5 +1,5 @@
 import pymongo, re
-from _utils import *
+from Inspect._utils import *
 from bson.code import Code as BsonCode
 import json
 import collections
@@ -10,10 +10,9 @@ import json
 # import numpy
 
 class MongoDB(db_comm):
-    def __init__(self, dbsets):
+    def __init__(self, con):
         try:
-            self._client = pymongo.MongoClient(dbsets['host'], dbsets['port'])
-            self.dbsets = dbsets
+            self._client = pymongo.MongoClient(con['host'], con['port'])
         except ConnectionError, e:
             msg = 'CONNECTION ERROR %s: %s' % (type(e).__name__, str(e))
             print msg
@@ -59,7 +58,8 @@ class MongoDB(db_comm):
     def get_values(self, dbname, t_name, limit = SIMPLE_LIMIT):
         db = self.get_database(dbname)
         c = db[t_name].find(limit=limit)
-        return self._process_data(c)[0]
+        data, _ = self._process_data(c)
+        return data
     
     def execute(self, code, ex_type = None):
         try:

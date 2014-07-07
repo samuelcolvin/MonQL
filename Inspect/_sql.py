@@ -1,33 +1,32 @@
 import MySQLdb as mdb
 import sqlite3
-from _utils import *
+from Inspect._utils import *
 # import pandas.io.sql as psql
 import traceback
 
 class _SqlBase(db_comm):
     _con=None
     
-    def __init__(self, dbsets):
-        self._dbsets = dbsets
+    def __init__(self, con_sets):
+        self._con_sets = con_sets
         self._setup_types()
         self._con_cur()
-        self.db_name = dbsets['db_name']
+        self.db_name = con_sets['dbname']
     
     def _con_cur(self):
         if not self._con:
             self._con = self._get_con()
             self._cur = self._con.cursor()
     
-    def get_tables(self):
-        tables, field_names = self._get_tables()
-        return tables, field_names
+    def get_tables(self, dbname):
+        return self._get_tables(dbname)
         
-    def get_table_fields(self, t_name):
-        sql = 'SELECT * FROM %s LIMIT 1' % t_name
+    def get_table_fields(self, dbname, t_name):
+        sql = 'SELECT * FROM %s.%s LIMIT 1' % (dbname, t_name)
         return self.get_query_fields(sql)
 
     def server_info(self):
-        return 'unknown'
+        return ''
     
     def get_query_fields(self, sql, ex_type = None):
         if 'limit' not in sql.lower():
@@ -41,8 +40,8 @@ class _SqlBase(db_comm):
         self._close()
         return fields
     
-    def get_values(self, t_name, limit = 20):
-        cur = self._execute('SELECT * FROM %s LIMIT %d' % (t_name, limit))
+    def get_values(self, dbname, t_name, limit = 20):
+        cur = self._execute('SELECT * FROM %s.%s LIMIT %d' % (dbname, t_name, limit))
         return self._process_data(cur.fetchall())[0]
     
     def execute(self, sql, ex_type = None):
@@ -93,7 +92,7 @@ class _SqlBase(db_comm):
         
     def _process_data(self, data):
         fields = [col[0] for col in self._cur.description]
-        name_fields = [i for i, f in enumerate(fields) if 'name' in f]
+        name_fields = [i for i, f in enumerate(fields) if 'dbname' in f]
         i2 = 1
         if len(name_fields) > 0:
             i2 = name_fields[0]
@@ -130,11 +129,11 @@ class _SqlBase(db_comm):
             except:
                 pass
 
-class MySql(_SqlBase):
+class MySQL(_SqlBase):
             
     def _get_con(self):
-        return mdb.connect(self._dbsets['host'], self._dbsets['username'], 
-                               self._dbsets['password'], self._dbsets['db_name'], port=self._dbsets['port'])
+        return mdb.connect(self._con_sets['host'], self._con_sets.get('user', None), 
+                               self._con_sets.get('pass', None), port=self._con_sets['port'])
             
         
     def get_version(self):
@@ -149,9 +148,9 @@ class MySql(_SqlBase):
         self._close()
         return dbs
     
-    def _get_tables(self):
+    def _get_tables(self, dbname):
         tables = []
-        cur, fields = self._execute_get_descrition('SHOW TABLE STATUS')
+        cur, fields = self._execute_get_descrition('SHOW TABLE STATUS IN %s' % dbname)
         field_names = [i[0] for i in fields]
         for t_info in cur.fetchall():
             tables.append((t_info[0], t_info))
@@ -164,7 +163,7 @@ class MySql(_SqlBase):
 class SQLite(_SqlBase):
         
     def _get_con(self):
-        return sqlite3.connect(self._dbsets['path'])
+        return sqlite3.connect(self._con_sets['path'])
 
     def get_version(self):
         return sqlite3.sqlite_version
@@ -172,7 +171,7 @@ class SQLite(_SqlBase):
     def get_databases(self):
         return []
     
-    def _get_tables(self):
+    def _get_tables(self, dbname):
         tables = []
         cur, fields = self._execute_get_descrition("SELECT * FROM sqlite_master WHERE type='table';")
         field_names = [i[0] for i in fields]

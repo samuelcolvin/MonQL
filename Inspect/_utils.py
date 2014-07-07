@@ -2,6 +2,7 @@ import re
 import chardet
 import StringIO
 # import numpy
+import json
 
 MAX_ROWS = 1000
 SIMPLE_LIMIT = 50
@@ -53,6 +54,8 @@ class db_comm(object):
         return file_stream.getvalue()
     
 def smart_text(s, encoding='utf-8', errors='strict'):
+    if isinstance(s, dict):
+        return json.dumps(s, indent=2)
     if isinstance(s, unicode):
         return s
     try:

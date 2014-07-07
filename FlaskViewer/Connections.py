@@ -157,6 +157,7 @@ class TreeGenerater(object):
             for name, value in self._con.items():
                 c['info'][0][1].append((name, value))
             c['info'][0][1].append(('DB Version', self._comms.get_version()))
+            c['info'][0][1].append(('Server Info', self._comms.server_info()))
             dbs = []
             for name in self._comms.get_databases():
                 dbs.append(('', name))
@@ -192,8 +193,8 @@ class TreeGenerater(object):
             fields = self._comms.get_table_fields(dbname, t_name)
             table['info'][0][1].append(('Field Count', len(fields)))
             table['fields'] = fields
-            for field in fields:
-                table['info'][1][1].append((field[0], str(field[1])))
+            for name, field_type in fields:
+                table['info'][1][1].append((name, str(field_type)))
             t_data.append(table)
         return t_data
             
