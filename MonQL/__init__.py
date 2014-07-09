@@ -4,6 +4,6 @@ __version__ = '0.0.1'
 
 app = Flask(__name__)
 
-app.config.from_object('settings')
+app.config.from_object('MonQL.settings')
 
 import MonQL.controllers

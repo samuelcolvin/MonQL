@@ -69,9 +69,9 @@ def test_connection(conid):
         response += 'connecting with %s\n' % comms.__class__.__name__
         response += 'Successfully connected\n'
         response += 'Version: %s\n' % comms.get_version()
-        response += 'Server Info:\n%s\n' % comms.server_info()
+        response += 'Server Info: %s\n' % comms.server_info()
         if 'dbname' in con:
-            response += 'Connection to db %s\n' % con['dbname']
+            response += 'Connecting to db %s\n' % con['dbname']
             tables, _ = comms.get_tables(con['dbname'])
             response += '%d tables found\n' % len(tables)
         else:
@@ -171,7 +171,7 @@ class TreeGenerater(object):
             c['children'] = self._get_dbs(dbs)
         except Exception, e:
             traceback.print_exc()
-            self.data['ERROR'] = str(e)
+            self.data['ERROR'] = '%s: %s' % (e.__class__.__name__, str(e))
         else:
             self.data['DATA'].append(c)
 
@@ -191,11 +191,13 @@ class TreeGenerater(object):
                 if type(value) == dtdt:
                     value = value.strftime('%Y-%m-%d %H:%M:%S %Z')
                 table['info'][0][1].append((name, value))
-            fields = self._comms.get_table_fields(dbname, t_name)
-            table['info'][0][1].append(('Field Count', len(fields)))
-            table['fields'] = fields
-            for name, field_type in fields:
-                table['info'][1][1].append((name, str(field_type)))
+            try:
+                fields = self._comms.get_table_fields(dbname, t_name)
+                table['info'][0][1].append(('Field Count', len(fields)))
+                table['fields'] = fields
+                for name, field_type in fields:
+                    table['info'][1][1].append((name, str(field_type)))
+            except: pass
             t_data.append(table)
         return t_data
             

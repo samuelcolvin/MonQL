@@ -1,5 +1,6 @@
 import MySQLdb as mdb
 import sqlite3
+import psycopg2
 from MonQL.Inspect._utils import *
 import traceback
 
@@ -104,31 +105,35 @@ class _SqlBase(db_comm):
                 self._types[v] = t
         
     def _close(self):
-            try:
-                self._con.close()
-                self._con = None
-            except:
-                pass
+        try:
+            self._con.close()
+            self._con = None
+        except:
+            pass
 
 class MySQL(_SqlBase):
-            
+
     def _get_con(self):
         return mdb.connect(self._con_sets['host'], self._con_sets.get('user', None), 
                                self._con_sets.get('pass', None), port=self._con_sets['port'])
-            
-        
+
     def get_version(self):
         cur = self._execute('SELECT VERSION()')
         return cur.fetchone()
-    
+
     def get_databases(self):
         cur = self._execute('SHOW DATABASES')
-        dbs = []
-        for d_info in cur.fetchall():
-            dbs.append(d_info[0])
+        dbs = [info[0] for info in cur.fetchall()]
         self._close()
         return dbs
     
+    def _execute_get_descrition(self, sql):
+        cur = self._execute(sql)
+        fields = []
+        for col in cur.description:
+            self._process_column(col, fields)
+        return cur, fields
+
     def _get_tables(self, dbname):
         tables = []
         cur, fields = self._execute_get_descrition('SHOW TABLE STATUS IN %s' % dbname)
@@ -137,9 +142,47 @@ class MySQL(_SqlBase):
             tables.append((t_info[0], t_info))
         self._close()
         return tables, field_names
+
+    def _process_column(self, col, fields):
+        fields.append((col[0], self._types[col[1]]))
+
+class PostgreSQL(_SqlBase):
+
+    def _get_con(self):
+        return psycopg2.connect('user=%(user)s host=%(host)s dbname = %(dbname)s' % self._con_sets)
+
+    def get_version(self):
+        info = self.server_info()
+        if ' on' in info:
+            return info[:info.index(' on')]
+        return info
+
+    def server_info(self):
+        cur = self._execute('SELECT VERSION()')
+        return cur.fetchone()[0]
+        
+    def get_table_fields(self, dbname, t_name):
+        sql = 'SELECT * FROM %s LIMIT 1' % t_name
+        return self.get_query_fields(sql)
+
+    def get_databases(self):
+        cur = self._execute('SELECT datname FROM pg_database WHERE datistemplate = false')
+        dbs = [info[0] for info in cur.fetchall()]
+        self._close()
+        return dbs
+    
+    def _get_tables(self, dbname):
+        tables = []
+        cur, fields = self._execute_get_descrition('SELECT * FROM information_schema.tables')
+        # tables = [': '.join(t) for t in cur.fetchall()]
+        field_names = [i[0] for i in fields]
+        for t_info in cur.fetchall():
+            tables.append((t_info[2], t_info))
+        self._close()
+        return tables, field_names
     
     def _process_column(self, col, fields):
-        fields.append([col[0], self._types[col[1]]])
+        fields.append([col.name, self._types.get(col.type_code, None)])
 
 class SQLite(_SqlBase):
         

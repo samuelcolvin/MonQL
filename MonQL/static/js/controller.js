@@ -108,7 +108,7 @@ function IndexCtrl($scope, $rootScope, $http) {
 	});
 }
 
-var default_ports = {MongoDB: 27017, MySQL: 3306};
+var default_ports = {MongoDB: 27017, MySQL: 3306, PostgreSQL: 5432};
 
 function response_error(prefix, data){
     var msg = prefix;

@@ -5,6 +5,7 @@
 			<option>MongoDB</option>
 			<option>MySQL</option>
 			<option>SQLite</option>
+			<option>PostgreSQL</option>
 		</select>
 	</div>
 	<div class="form-group">
@@ -12,10 +13,11 @@
 		<input type="text" class="form-control" name="conref" id="conref" placeholder="Display name" ng-model="con.ref" required>
 		<div ng-show="form.conref.$dirty && form.conref.$error.required" class="warning">A DB Reference is required</div>
 	</div>
-	<div ng-show="con.dbtype == 'MongoDB' || con.dbtype == 'MySQL'" class="form-group">
+	<div ng-show="con.dbtype == 'MongoDB' || con.dbtype == 'MySQL' || con.dbtype == 'PostgreSQL'" class="form-group">
 		<label for="conname">Database Name</label>
-		<input type="text" class="form-control" name="conname" id="conname" placeholder="Database name" ng-model="con.dbname">
-		<p class="help-block">Leave blank to view all databases.</p>
+		<input type="text" class="form-control" name="conname" id="conname" placeholder="Database name" ng-model="con.dbname" ng-required="con.dbtype == 'PostgreSQL'">
+			<div ng-show="form.conhost.$dirty && form.conhost.$error.required" class="warning">Required for PostgreSQL connections</div>
+		<p ng-show="con.dbtype != 'PostgreSQL'" class="help-block">Leave blank to view all databases.</p>
 	</div>
 	<div ng-show="con.dbtype == 'SQLite'" class="form-group">
 		<label ng-show="con.dbtype == 'SQLite'" for="conpath">File Path</label>
@@ -23,7 +25,7 @@
 		<div ng-show="form.conname.$dirty && form.conname.$error.required" class="warning">Path is Required</div>
 		<p class="help-block">Name for the connection in MonQL.</p>
 	</div>
-	<div ng-show="con.dbtype == 'MongoDB' || con.dbtype == 'MySQL'">
+	<div ng-show="con.dbtype == 'MongoDB' || con.dbtype == 'MySQL' || con.dbtype == 'PostgreSQL'">
 		<div class="form-group">
 			<label for="conuser">Connection Username</label>
 			<input type="text" class="form-control" id="conuser" placeholder="Connection username" ng-model="con.user">
@@ -39,6 +41,7 @@
 			<input type="text" class="form-control" id="conhost" name="conhost" placeholder="Host IP address" ng-model="con.host" ng-required="con.dbtype != 'SQLite'">
 			<div ng-show="form.conhost.$dirty && con.dbtype == 'MongoDB' && form.conhost.$error.required" class="warning">Required for MongoDB connections</div>
 			<div ng-show="form.conhost.$dirty && con.dbtype == 'MySQL' && form.conhost.$error.required" class="warning">Required for MySQL connections</div>
+			<div ng-show="form.conhost.$dirty && con.dbtype == 'PostgreSQL' && form.conhost.$error.required" class="warning">Required for PostgreSQL connections</div>
 			<p class="help-block">Use <strong>"localhost"</strong> for this computer, or an IP address for remote connections.</p>
 		</div>
 		<div class="form-group">
@@ -46,6 +49,7 @@
 			<input type="text" class="form-control" name="conport" id="conport" placeholder="Port number" ng-model="con.port" ng-required="con.dbtype != 'SQLite'">
 			<div ng-show="form.conport.$dirty && con.dbtype == 'MongoDB' && form.conport.$error.required" class="warning">Required for MongoDB connections</div>
 			<div ng-show="form.conport.$dirty && con.dbtype == 'MySQL' && form.conport.$error.required" class="warning">Required for MySQL connections</div>
+			<div ng-show="form.conport.$dirty && con.dbtype == 'PostgreSQL' && form.conport.$error.required" class="warning">Required for PostgreSQL connections</div>
 			<p class="help-block">The port to connect to the database server on.</p>
 		</div>
 	</div>

@@ -4,8 +4,8 @@ from MonQL.Connections import app, connections, test_connection, tree_json
 
 def jsonabort(e):
     traceback.print_exc()
-    print 'ERROR: %s' % str(e)
-    return jsonify(error = str(e)), 400
+    error = '%s: %s' % (e.__class__.__name__, str(e))
+    return jsonify(error = error), 400
 
 def jsonifyany(ob):
     if isinstance(ob, list):

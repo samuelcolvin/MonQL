@@ -5,3 +5,4 @@ MySQL-python
 # pysqlite
 GrabLib
 chardet
+psycopg2
